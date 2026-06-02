@@ -1,10 +1,67 @@
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useTransform } from "framer-motion";
 import { ArrowRight, ShieldCheck, Landmark, PiggyBank, Sparkles, TrendingUp } from "lucide-react";
 
 export default function Hero() {
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  // Transform mouse coordinates into degree rotations
+  const rotateX = useTransform(y, [-200, 200], [15, -15]);
+  const rotateY = useTransform(x, [-200, 200], [-15, 15]);
+
+  // Transform coordinates for glare reflection effect
+  const glareX = useMotionValue(50);
+  const glareY = useMotionValue(50);
+  const glareOpacity = useMotionValue(0);
+
+  function handleMouseMove(event: React.MouseEvent<HTMLDivElement>) {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    
+    // Mouse coords from center
+    const mouseX = event.clientX - rect.left - width / 2;
+    const mouseY = event.clientY - rect.top - height / 2;
+    
+    x.set(mouseX);
+    y.set(mouseY);
+
+    // Percentage of cursor inside card
+    const pctX = ((event.clientX - rect.left) / width) * 100;
+    const pctY = ((event.clientY - rect.top) / height) * 100;
+    
+    glareX.set(pctX);
+    glareY.set(pctY);
+    glareOpacity.set(0.35);
+  }
+
+  function handleMouseLeave() {
+    x.set(0);
+    y.set(0);
+    glareOpacity.set(0);
+  }
+
+  const glareBackground = useTransform(
+    [glareX, glareY],
+    (values) => {
+      const gx = values[0] as number;
+      const gy = values[1] as number;
+      return `radial-gradient(circle at ${gx}% ${gy}%, rgba(212, 175, 55, 0.25) 0%, rgba(255, 255, 255, 0.15) 30%, transparent 60%)`;
+    }
+  );
+
+  const holoBg = useTransform(
+    [glareX, glareY],
+    (values) => {
+      const gx = values[0] as number;
+      const gy = values[1] as number;
+      return `linear-gradient(${gx + gy}deg, #ffd700, #ff007f, #00f0ff, #ffd700)`;
+    }
+  );
+
   return (
     <section
       id="home"
@@ -107,114 +164,139 @@ export default function Hero() {
             </motion.div>
           </div>
 
-          {/* Hero Right Dashboard Graphic */}
-          <div className="lg:col-span-5 flex justify-center items-center">
+          {/* Hero Right ATM Card Design */}
+          <div className="lg:col-span-5 flex justify-center items-center relative perspective-[1200px]">
+            {/* Background Glows */}
+            <div className="absolute w-[350px] h-[350px] bg-brand-gold/10 rounded-full filter blur-[100px] pointer-events-none z-0"></div>
+            <div className="absolute w-[250px] h-[250px] bg-brand-blue/30 rounded-full filter blur-[80px] pointer-events-none z-0"></div>
+
             <motion.div
               initial={{ opacity: 0, scale: 0.9, rotate: 2 }}
               animate={{ opacity: 1, scale: 1, rotate: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="relative w-full max-w-[450px] aspect-square flex items-center justify-center"
+              className="relative w-full max-w-[420px] aspect-[1.586/1] z-10 flex items-center justify-center"
             >
-              {/* Spinning background circles */}
-              <div className="absolute inset-0 border border-brand-gold/15 rounded-full animate-[spin_40s_linear_infinite]"></div>
-              <div className="absolute inset-8 border border-dashed border-slate-600/30 rounded-full animate-[spin_25s_linear_infinite_reverse]"></div>
+              {/* Interactive 3D ATM Card */}
+              <motion.div
+                style={{
+                  rotateX,
+                  rotateY,
+                  transformStyle: "preserve-3d",
+                }}
+                onMouseMove={handleMouseMove}
+                onMouseLeave={handleMouseLeave}
+                className="relative w-full h-full rounded-2xl bg-gradient-to-br from-slate-950 via-[#1c194f] to-brand-blue-dark p-6 sm:p-7 shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-brand-gold/45 cursor-pointer select-none overflow-hidden flex flex-col justify-between"
+              >
+                {/* Glare effect */}
+                <motion.div
+                  style={{
+                    background: glareBackground,
+                    opacity: glareOpacity,
+                  }}
+                  className="absolute inset-0 z-10 pointer-events-none transition-opacity duration-200"
+                />
 
-              {/* Dynamic CSS Mockup Dashboard */}
-              <div className="absolute w-[85%] h-[85%] rounded-3xl bg-slate-900/60 dark:bg-brand-blue-deep/60 backdrop-blur-md border border-brand-gold/20 shadow-2xl p-6 flex flex-col justify-between overflow-hidden group">
-                
-                {/* Dashboard Top bar */}
-                <div className="flex items-center justify-between border-b border-slate-700/50 pb-3">
+                {/* Card Header: Logo & Card Type */}
+                <div className="flex items-center justify-between z-20">
                   <div className="flex items-center gap-2">
-                    <div className="w-2.5 h-2.5 rounded-full bg-red-500"></div>
-                    <div className="w-2.5 h-2.5 rounded-full bg-yellow-500"></div>
-                    <div className="w-2.5 h-2.5 rounded-full bg-green-500"></div>
+                    <div className="w-8 h-8 rounded-md overflow-hidden border border-brand-gold/30 bg-white">
+                      <img src="/KKNL.jpg" alt="KKNL Logo" className="w-full h-full object-cover" />
+                    </div>
+                    <div className="flex flex-col leading-none text-left">
+                      <span className="font-heading font-black text-sm tracking-wide text-white">
+                        KKNL
+                      </span>
+                      <span className="font-heading font-bold text-[6.5px] tracking-[0.5px] text-brand-gold uppercase">
+                        Kusumbha Kalyan Nidhi Ltd.
+                      </span>
+                    </div>
                   </div>
-                  <div className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold">
-                    Secure Server
+                  <div className="text-[8px] tracking-[1px] font-extrabold text-brand-gold bg-brand-gold/15 border border-brand-gold/30 rounded px-2 py-0.5 uppercase">
+                    Platinum Member
                   </div>
                 </div>
 
-                {/* Growth Chart Panel */}
-                <div className="my-4 flex-1 flex flex-col justify-between">
-                  <div className="flex items-center justify-between mb-2">
-                    <div>
-                      <span className="text-slate-400 text-xs block">KKNL Account Net Asset Growth</span>
-                      <span className="font-heading font-black text-2xl text-brand-gold">₹500,432.80</span>
+                {/* Card Chip & Contactless indicator */}
+                <div className="flex items-center justify-between mt-3 z-20">
+                  {/* EMV Chip */}
+                  <div className="relative w-11 h-8 rounded-md bg-gradient-to-br from-[#f0dfa8] via-[#D4AF37] to-[#b39126] overflow-hidden border border-[#D4AF37]/50 shadow-inner flex items-center justify-center">
+                    {/* Chip Lines */}
+                    <div className="absolute inset-0 grid grid-cols-3 grid-rows-3 opacity-30">
+                      <div className="border-r border-b border-black"></div>
+                      <div className="border-r border-b border-black"></div>
+                      <div className="border-b border-black"></div>
+                      <div className="border-r border-b border-black"></div>
+                      <div className="border-r border-b border-black"></div>
+                      <div className="border-b border-black"></div>
+                      <div className="border-r border-black"></div>
+                      <div className="border-r border-black"></div>
+                      <div></div>
                     </div>
-                    <span className="text-[10px] bg-brand-gold/10 text-brand-gold font-bold px-2 py-0.5 rounded border border-brand-gold/20">
-                      +14.8%
-                    </span>
+                    <div className="w-3.5 h-3.5 rounded-full border border-black/20 absolute"></div>
                   </div>
-                  
-                  {/* SVG Chart */}
-                  <div className="w-full h-24 relative overflow-hidden">
-                    <svg viewBox="0 0 300 100" className="w-full h-full">
-                      <defs>
-                        <linearGradient id="chart-fill" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#D4AF37" stopOpacity="0.3"/>
-                          <stop offset="100%" stopColor="#D4AF37" stopOpacity="0"/>
-                        </linearGradient>
-                      </defs>
-                      {/* Grid Lines */}
-                      <line x1="0" y1="20" x2="300" y2="20" stroke="rgba(255,255,255,0.05)" strokeDasharray="3" />
-                      <line x1="0" y1="50" x2="300" y2="50" stroke="rgba(255,255,255,0.05)" strokeDasharray="3" />
-                      <line x1="0" y1="80" x2="300" y2="80" stroke="rgba(255,255,255,0.05)" strokeDasharray="3" />
-                      
-                      {/* Chart Path */}
-                      <path
-                        d="M 0 90 Q 50 60 90 75 T 180 30 T 260 15 T 300 10 L 300 100 L 0 100 Z"
-                        fill="url(#chart-fill)"
-                      />
-                      <path
-                        d="M 0 90 Q 50 60 90 75 T 180 30 T 260 15 T 300 10"
-                        fill="none"
-                        stroke="#D4AF37"
-                        strokeWidth="3.5"
-                        strokeLinecap="round"
-                        className="animate-[dash_3s_ease-out_infinite]"
-                      />
-                      
-                      {/* Moving glowing node */}
-                      <circle cx="300" cy="10" r="4.5" fill="#D4AF37" className="animate-ping" />
-                      <circle cx="300" cy="10" r="3" fill="#FFFFFF" />
+
+                  {/* Contactless waves icon */}
+                  <div className="w-6 h-6 flex items-center justify-center text-white/80">
+                    <svg viewBox="0 0 24 24" className="w-full h-full stroke-current" fill="none" strokeWidth="2.5" strokeLinecap="round">
+                      <path d="M 5 12 A 4 4 0 0 1 5 6" transform="translate(14,0) scale(0.6)" />
+                      <path d="M 5 12 A 8 8 0 0 1 5 4" transform="translate(10,0) scale(0.8)" />
+                      <path d="M 5 12 A 12 12 0 0 1 5 2" transform="translate(6,0) scale(1)" />
+                      <path d="M 5 12 A 16 16 0 0 1 5 0" transform="translate(2,0) scale(1.2)" />
                     </svg>
                   </div>
                 </div>
 
-                {/* Dashboard Bottom Overlay Cards */}
-                <div className="grid grid-cols-2 gap-3 mt-1.5 border-t border-slate-700/50 pt-3">
-                  <div className="bg-brand-blue-dark/50 border border-slate-700/40 rounded-xl p-2.5 flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-brand-gold/15 flex items-center justify-center text-brand-gold">
-                      💰
+                {/* Card Number */}
+                <div className="mt-4 font-mono text-base sm:text-lg tracking-[3.5px] font-bold text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-slate-300 drop-shadow-[0_2px_2px_rgba(0,0,0,0.85)] z-20 text-left select-text">
+                  5399 &nbsp; 8812 &nbsp; 3456 &nbsp; 7890
+                </div>
+
+                {/* Card Footer: Holder name, Expiry, Hologram & Network */}
+                <div className="flex justify-between items-end mt-2 z-20">
+                  <div className="flex gap-5 text-left">
+                    <div className="flex flex-col">
+                      <span className="text-[6px] uppercase tracking-wider text-slate-400">Card Holder</span>
+                      <span className="font-heading font-black text-[10px] tracking-wide text-white uppercase mt-0.5">
+                        Valued Member
+                      </span>
                     </div>
-                    <div>
-                      <span className="text-[9px] text-slate-400 block uppercase">FD Rate</span>
-                      <span className="font-heading font-extrabold text-xs text-white">Up to 8.25%</span>
+                    <div className="flex flex-col">
+                      <span className="text-[6px] uppercase tracking-wider text-slate-400">Valid Thru</span>
+                      <span className="font-mono font-bold text-[9px] text-white mt-0.5">
+                        12/30
+                      </span>
                     </div>
                   </div>
-                  <div className="bg-brand-blue-dark/50 border border-slate-700/40 rounded-xl p-2.5 flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-brand-gold/15 flex items-center justify-center text-brand-gold">
-                      ⚡
-                    </div>
-                    <div>
-                      <span className="text-[9px] text-slate-400 block uppercase">Gold Loan</span>
-                      <span className="font-heading font-extrabold text-xs text-white">Quick Disburse</span>
+
+                  <div className="flex items-center gap-2">
+                    {/* Shifting Hologram */}
+                    <motion.div
+                      style={{ background: holoBg }}
+                      className="w-8 h-6 rounded opacity-90 border border-white/25 flex items-center justify-center overflow-hidden relative shadow-inner"
+                    >
+                      <span className="text-[7px] font-black text-white drop-shadow-md tracking-wider">KKNL</span>
+                    </motion.div>
+
+                    {/* Network Brand */}
+                    <div className="flex flex-col items-end leading-none">
+                      <span className="font-heading font-black text-[11px] text-brand-gold italic">Nidhi</span>
+                      <span className="text-[5.5px] text-white/80 font-bold uppercase tracking-[1px] mt-0.5">Network</span>
                     </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
 
-              {/* Floating micro widgets outside dashboard card */}
-              <div className="absolute top-[8%] -right-[4%] bg-slate-900 border border-brand-gold/30 rounded-2xl shadow-xl px-4 py-2 flex items-center gap-2 animate-float">
+              {/* Floating micro widgets outside ATM card */}
+              <div className="absolute -top-[12%] -right-[5%] bg-slate-900 border border-brand-gold/30 rounded-2xl shadow-xl px-4 py-2 flex items-center gap-2 animate-float pointer-events-none">
                 <span className="text-emerald-400 text-sm">✓</span>
                 <span className="text-xs font-bold text-slate-200">100% Secure Saving</span>
               </div>
-              <div className="absolute bottom-[10%] -left-[6%] bg-slate-900 border border-brand-gold/30 rounded-2xl shadow-xl px-4 py-2.5 flex items-center gap-3 animate-float-delayed">
+              <div className="absolute -bottom-[12%] -left-[5%] bg-slate-900 border border-brand-gold/30 rounded-2xl shadow-xl px-4 py-2.5 flex items-center gap-3 animate-float-delayed pointer-events-none">
                 <div className="w-6 h-6 rounded-full bg-brand-gold flex items-center justify-center text-[10px] text-brand-blue font-bold">
                   ★
                 </div>
-                <div className="leading-tight">
-                  <span className="text-[10px] text-slate-400 block">Trust Rating</span>
+                <div className="leading-tight text-left">
+                  <span className="text-[9px] text-slate-400 block">Trust Rating</span>
                   <span className="text-xs font-extrabold text-white">Excellent (4.9/5)</span>
                 </div>
               </div>
