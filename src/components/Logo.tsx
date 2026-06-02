@@ -11,26 +11,11 @@ export default function Logo({ className = "h-11", showText = true }: LogoProps)
   return (
     <div className="flex items-center gap-2 select-none cursor-pointer">
       <div className={`${className} aspect-square relative flex items-center justify-center`}>
-        {/* Crest SVG emblem */}
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" className="w-full h-full">
-          <defs>
-            <linearGradient id="crest-gold" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#F3D97B" />
-              <stop offset="50%" stopColor="#D4AF37" />
-              <stop offset="100%" stopColor="#AA821C" />
-            </linearGradient>
-            <linearGradient id="crest-blue" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#4A44C4" />
-              <stop offset="100%" stopColor="#2E2A7B" />
-            </linearGradient>
-          </defs>
-          {/* Outer Crest Shield */}
-          <path d="M 40 5 L 72 20 Q 72 52 40 78 Q 8 52 8 20 Z" fill="url(#crest-blue)" stroke="url(#crest-gold)" strokeWidth={2.5} />
-          {/* Wealth Growth Sprout */}
-          <path d="M 40 60 L 40 28 M 40 43 Q 32 38 25 47 M 40 36 Q 48 31 55 40" fill="none" stroke="url(#crest-gold)" strokeWidth={3} strokeLinecap="round" />
-          {/* Golden Coin Shield Core */}
-          <circle cx="40" cy="22" r="5" fill="url(#crest-gold)" />
-        </svg>
+        <img
+          src="/KKNL.jpg"
+          alt="KKNL Logo"
+          className="w-full h-full object-cover rounded-lg border border-brand-gold/30 shadow-sm"
+        />
       </div>
       {showText && (
         <div className="flex flex-col leading-none">

@@ -19,8 +19,8 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "KKNL Team" }],
   icons: {
-    icon: "/logo.svg",
-    shortcut: "/logo.svg",
+    icon: "/KKNL.jpg",
+    shortcut: "/KKNL.jpg",
   },
 };
 
