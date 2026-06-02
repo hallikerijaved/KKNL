@@ -21,18 +21,18 @@ export default function Hero() {
     const rect = event.currentTarget.getBoundingClientRect();
     const width = rect.width;
     const height = rect.height;
-    
+
     // Mouse coords from center
     const mouseX = event.clientX - rect.left - width / 2;
     const mouseY = event.clientY - rect.top - height / 2;
-    
+
     x.set(mouseX);
     y.set(mouseY);
 
     // Percentage of cursor inside card
     const pctX = ((event.clientX - rect.left) / width) * 100;
     const pctY = ((event.clientY - rect.top) / height) * 100;
-    
+
     glareX.set(pctX);
     glareY.set(pctY);
     glareOpacity.set(0.35);
@@ -77,7 +77,7 @@ export default function Hero() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
         <div className="grid lg:grid-cols-12 gap-12 lg:gap-8 items-center">
-          
+
           {/* Hero Left Content */}
           <div className="lg:col-span-7 flex flex-col justify-center text-center lg:text-left">
             {/* Tagline Badge */}
@@ -257,7 +257,7 @@ export default function Hero() {
                     <div className="flex flex-col">
                       <span className="text-[6px] uppercase tracking-wider text-slate-400">Card Holder</span>
                       <span className="font-heading font-black text-[10px] tracking-wide text-white uppercase mt-0.5">
-                        Valued Member
+                        Sarvesh Pandekar
                       </span>
                     </div>
                     <div className="flex flex-col">
